@@ -1,9 +1,13 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Database URL (PostgreSQL)
-DATABASE_URL = "postgresql://postgres:1234@localhost:5433/recommendation_db"
+#DATABASE_URL = "postgresql://postgres:1234@localhost:5433/recommendation_db"
+
+# Read DATABASE_URL from environment variable
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create the database engine
 engine = create_engine(DATABASE_URL)
