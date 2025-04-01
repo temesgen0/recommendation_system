@@ -52,3 +52,46 @@ class RecommendationService:
         # Query similar products
         results = self.faiss_db.query_similar(user_embedding, top_k)
         return results
+
+    def find_related_products(self, product_id: int, top_k: int = 5,):
+        """
+        Find related products based on a product ID.
+        """
+        # Fetch the product by ID
+        product = self.db.query(Product).filter(Product.id == product_id).first()
+        if not product:
+            return []
+
+        # Generate embedding for the product description
+        embedding = self.embedding_service.generate_embedding(product.description)
+
+        # Query FAISS for similar products
+        results = self.faiss_db.query_similar(embedding, top_k)
+
+        # Fetch product details from the database
+        related_products = []
+        for result in results:
+            related_product = self.db.query(Product).filter(Product.id == result["product_id"]).first()
+            if related_product:
+                related_products.append(related_product)
+
+        return related_products
+
+    def search_products(self, query: str, top_k: int = 5):
+        """
+        Search products by a query string.
+        """
+        # Generate embedding for the search query
+        embedding = self.embedding_service.generate_embedding(query)
+
+        # Query FAISS for similar products
+        results = self.faiss_db.query_similar(embedding, top_k)
+
+        # Fetch product details from the database
+        products = []
+        for result in results:
+            product = self.db.query(Product).filter(Product.id == result["product_id"]).first()
+            if product:
+                products.append(product)
+
+        return products
